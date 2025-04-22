@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Image Comparison Tool</title>
+    <!-- Particles.js CDN -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <!-- Tilt.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tilt.js/1.2.1/tilt.jquery.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -2;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 1s ease;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, #fff, #ddd);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .upload-container {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .upload-box {
+            width: 100%;
+            max-width: 450px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .upload-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.5);
+        }
+
+        .file-input-label {
+            display: block;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-align: center;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+        }
+
+        .file-input-label:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .file-input-label i {
+            margin-right: 8px;
+            font-size: 1.2rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .preview-box {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .preview-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 250px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .preview-image:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .submit-btn {
+            display: block;
+            width: 220px;
+            margin: 3rem auto;
+            padding: 1rem;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 1.5s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
+        }
+
+        .submit-btn:active {
+            transform: translateY(1px);
+        }
+
+        .submit-btn:disabled {
+            background: linear-gradient(45deg, #95a5a6, #bdc3c7);
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .submit-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .submit-btn:hover::after {
+            transform: translateX(100%);
+        }
+
+        .result-section {
+            margin-top: 2rem;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            animation: fadeIn 1s ease;
+        }
+
+        .result-title {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            text-align: center;
+            background: linear-gradient(90deg, #fff, #ddd);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .result-content {
+            padding: 1rem;
+            line-height: 1.6;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .upload-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .upload-box {
+                width: 100%;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Particles.js Container -->
+    <div id="particles-js"></div>
+
+    <div class="container">
+        <header>
+            <h1>Advanced Image Comparison</h1>
+            <p class="subtitle">Upload two images to analyze and compare their properties with our powerful tool</p>
+        </header>
+
+        <div class="upload-container">
+            <div class="upload-box" id="tilt-box-1">
+                <label for="image1" class="file-input-label">
+                    <i class="fas fa-cloud-upload-alt"></i> Choose Image 1
+                </label>
+                <input type="file" id="image1" class="file-input" accept="image/*">
+
+                <div class="preview-box">
+                    <h3 class="preview-title">Image 1 Preview</h3>
+                    <img id="preview1" class="preview-image" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23f0f0f0' opacity='0.2'/%3E%3Ctext x='200' y='150' font-family='Arial' font-size='16' fill='%23ffffff' text-anchor='middle'%3EImage Preview%3C/text%3E%3C/svg%3E" alt="Image 1 Preview">
+                </div>
+            </div>
+
+            <div class="upload-box" id="tilt-box-2">
+                <label for="image2" class="file-input-label">
+                    <i class="fas fa-cloud-upload-alt"></i> Choose Image 2
+                </label>
+                <input type="file" id="image2" class="file-input" accept="image/*">
+
+                <div class="preview-box">
+                    <h3 class="preview-title">Image 2 Preview</h3>
+                    <img id="preview2" class="preview-image" src="data:image/svg+xml,%3Csvg xmlns='http://www3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23f0f0f0' opacity='0.2'/%3E%3Ctext x='200' y='150' font-family='Arial' font-size='16' fill='%23ffffff' text-anchor='middle'%3EImage Preview%3C/text%3E%3C/svg%3E" alt="Image 2 Preview">
+                </div>
+            </div>
+        </div>
+
+        <button id="submitBtn" class="submit-btn" disabled>
+            <span id="btnText">Process Images</span>
+        </button>
+
+        <div class="result-section">
+            <h2 class="result-title">Analysis Results</h2>
+            <div id="resultContent" class="result-content">
+                <p>Upload two images and click the "Process Images" button to see detailed analysis results.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize particles.js
+            particlesJS("particles-js", {
+                "particles": {
+                    "number": {
+                        "value": 80,
+                        "density": {
+                            "enable": true,
+                            "value_area": 800
+                        }
+                    },
+                    "color": {
+                        "value": "#ffffff"
+                    },
+                    "shape": {
+                        "type": "circle",
+                        "stroke": {
+                            "width": 0,
+                            "color": "#000000"
+                        },
+                        "polygon": {
+                            "nb_sides": 5
+                        }
+                    },
+                    "opacity": {
+                        "value": 0.5,
+                        "random": false,
+                        "anim": {
+                            "enable": false,
+                            "speed": 1,
+                            "opacity_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "size": {
+                        "value": 3,
+                        "random": true,
+                        "anim": {
+                            "enable": false,
+                            "speed": 40,
+                            "size_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "line_linked": {
+                        "enable": true,
+                        "distance": 150,
+                        "color": "#ffffff",
+                        "opacity": 0.4,
+                        "width": 1
+                    },
+                    "move": {
+                        "enable": true,
+                        "speed": 2,
+                        "direction": "none",
+                        "random": false,
+                        "straight": false,
+                        "out_mode": "out",
+                        "bounce": false,
+                        "attract": {
+                            "enable": false,
+                            "rotateX": 600,
+                            "rotateY": 1200
+                        }
+                    }
+                },
+                "interactivity": {
+                    "detect_on": "canvas",
+                    "events": {
+                        "onhover": {
+                            "enable": true,
+                            "mode": "grab"
+                        },
+                        "onclick": {
+                            "enable": true,
+                            "mode": "push"
+                        },
+                        "resize": true
+                    },
+                    "modes": {
+                        "grab": {
+                            "distance": 140,
+                            "line_linked": {
+                                "opacity": 1
+                            }
+                        },
+                        "bubble": {
+                            "distance": 400,
+                            "size": 40,
+                            "duration": 2,
+                            "opacity": 8,
+                            "speed": 3
+                        },
+                        "repulse": {
+                            "distance": 200,
+                            "duration": 0.4
+                        },
+                        "push": {
+                            "particles_nb": 4
+                        },
+                        "remove": {
+                            "particles_nb": 2
+                        }
+                    }
+                },
+                "retina_detect": true
+            });
+
+            // Initialize tilt.js on upload boxes
+            if (window.$) {
+                $('#tilt-box-1').tilt({
+                    maxTilt: 5,
+                    glare: true,
+                    maxGlare: 0.2,
+                    scale: 1.02
+                });
+                $('#tilt-box-2').tilt({
+                    maxTilt: 5,
+                    glare: true,
+                    maxGlare: 0.2,
+                    scale: 1.02
+                });
+            } else {
+                VanillaTilt.init(document.querySelectorAll(".upload-box"), {
+                    max: 5,
+                    speed: 400,
+                    glare: true,
+                    "max-glare": 0.2,
+                    scale: 1.02
+                });
+            }
+
+            const image1Input = document.getElementById('image1');
+            const image2Input = document.getElementById('image2');
+            const preview1 = document.getElementById('preview1');
+            const preview2 = document.getElementById('preview2');
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const resultContent = document.getElementById('resultContent');
+
+            let image1Data = null;
+            let image2Data = null;
+
+            // Function to handle image upload and preview
+            function handleImageUpload(input, preview, imageNumber) {
+                return function(e) {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    // Check if the file is an image
+                    if (!file.type.match('image.*')) {
+                        showError('Please select a valid image file (JPEG, PNG, etc.)');
+                        return;
+                    }
+
+                    // Check file size (max 5MB)
+                    if (file.size > 5 * 1024 * 1024) {
+                        showError('Image size should be less than 5MB');
+                        return;
+                    }
+
+                    const reader = new FileReader();
+
+                    reader.onload = function(event) {
+                        preview.src = event.target.result;
+                        preview.style.opacity = '0';
+                        setTimeout(() => {
+                            preview.style.opacity = '1';
+                            preview.style.transition = 'opacity 0.5s ease';
+                        }, 10);
+
+                        // Store the image data
+                        if (imageNumber === 1) {
+                            image1Data = {
+                                src: event.target.result,
+                                file: file
+                            };
+                        } else {
+                            image2Data = {
+                                src: event.target.result,
+                                file: file
+                            };
+                        }
+
+                        // Enable submit button if both images are uploaded
+                        if (image1Data && image2Data) {
+                            submitBtn.disabled = false;
+                            submitBtn.style.background = 'linear-gradient(45deg, #4facfe, #00f2fe)';
+                            submitBtn.style.boxShadow = '0 4px 15px rgba(79, 172, 254, 0.4)';
+                        }
+                    };
+
+                    reader.onerror = function() {
+                        showError('Error reading the image file');
+                    };
+
+                    reader.readAsDataURL(file);
+                };
+            }
+
+            function showError(message) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message';
+                errorDiv.style.color = '#ff6b6b';
+                errorDiv.style.marginTop = '10px';
+                errorDiv.style.textAlign = 'center';
+                errorDiv.style.fontWeight = '500';
+                errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+
+                // Remove any existing error messages
+                const existingErrors = document.querySelectorAll('.error-message');
+                existingErrors.forEach(err => err.remove());
+
+                document.body.appendChild(errorDiv);
+
+                // Remove error after 3 seconds
+                setTimeout(() => {
+                    errorDiv.style.opacity = '0';
+                    errorDiv.style.transition = 'opacity 0.5s ease';
+                    setTimeout(() => errorDiv.remove(), 500);
+                }, 3000);
+            }
+
+            // Event listeners for image uploads
+            image1Input.addEventListener('change', handleImageUpload(image1Input, preview1, 1));
+            image2Input.addEventListener('change', handleImageUpload(image2Input, preview2, 2));
+
+            // Submit button handler
+            submitBtn.addEventListener('click', function() {
+                // Show loading state
+                submitBtn.disabled = true;
+                btnText.textContent = 'Analyzing...';
+                resultContent.innerHTML = `
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                    </div>
+                    <p style="text-align: center; margin-top: 1rem;">Processing your images, please wait...</p>
+                `;
+
+                // Simulate processing (replace with actual image processing logic)
+                setTimeout(function() {
+                    // Get image dimensions after they load
+                    preview1.onload = preview2.onload = function() {
+                        // Example result - replace with your actual image processing results
+                        const resultHTML = `
+                            <div style="animation: fadeIn 0.8s ease;">
+                                <h3 style="font-size: 1.4rem; margin-bottom: 1.5rem; text-align: center;">Comparison Results</h3>
+                                <div style="display: flex; flex-wrap: wrap; gap: 2rem; justify-content: center; margin-bottom: 2rem;">
+                                    <div style="flex: 1; min-width: 250px; background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 12px;">
+                                        <h4 style="font-size: 1.2rem; margin-bottom: 1rem; color: #4facfe; text-align: center;">Image 1 Analysis</h4>
+                                        <p><i class="fas fa-image" style="margin-right: 8px;"></i> Dimensions: ${preview1.naturalWidth} × ${preview1.naturalHeight}px</p>
+                                        <p><i class="fas fa-weight-hanging" style="margin-right: 8px;"></i> Size: ${(image1Data.file.size / 1024).toFixed(2)} KB</p>
+                                        <p><i class="fas fa-file-alt" style="margin-right: 8px;"></i> Type: ${image1Data.file.type}</p>
+                                        <div style="margin-top: 1rem; text-align: center;">
+                                            <img src="${image1Data.src}" style="max-width: 100%; max-height: 150px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.2);">
+                                        </div>
+                                    </div>
+                                    <div style="flex: 1; min-width: 250px; background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 12px;">
+                                        <h4 style="font-size: 1.2rem; margin-bottom: 1rem; color: #00f2fe; text-align: center;">Image 2 Analysis</h4>
+                                        <p><i class="fas fa-image" style="margin-right: 8px;"></i> Dimensions: ${preview2.naturalWidth} × ${preview2.naturalHeight}px</p>
+                                        <p><i class="fas fa-weight-hanging" style="margin-right: 8px;"></i> Size: ${(image2Data.file.size / 1024).toFixed(2)} KB</p>
+                                        <p><i class="fas fa-file-alt" style="margin-right: 8px;"></i> Type: ${image2Data.file.type}</p>
+                                        <div style="margin-top: 1rem; text-align: center;">
+                                            <img src="${image2Data.src}" style="max-width: 100%; max-height: 150px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.2);">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 12px; margin-top: 1rem;">
+                                    <h4 style="font-size: 1.2rem; margin-bottom: 1rem; text-align: center;"><i class="fas fa-chart-bar" style="margin-right: 8px;"></i> Comparison Summary</h4>
+                                    <p><i class="fas fa-ruler-combined" style="margin-right: 8px;"></i> <strong>Dimension Difference:</strong> ${Math.abs(preview1.naturalWidth - preview2.naturalWidth)}px width, ${Math.abs(preview1.naturalHeight - preview2.naturalHeight)}px height</p>
+                                    <p><i class="fas fa-balance-scale" style="margin-right: 8px;"></i> <strong>Size Difference:</strong> ${Math.abs((image1Data.file.size - image2Data.file.size) / 1024).toFixed(2)} KB</p>
+                                    <p style="margin-top: 1rem; font-style: italic; text-align: center;">Note: This is a demo. Add your actual image processing logic here.</p>
+                                </div>
+                            </div>
+                        `;
+
+                        resultContent.innerHTML = resultHTML;
+                        btnText.textContent = 'Process Images';
+                        submitBtn.disabled = false;
+                        submitBtn.style.background = 'linear-gradient(45deg, #4facfe, #00f2fe)';
+                        submitBtn.style.boxShadow = '0 4px 15px rgba(79, 172, 254, 0.4)';
+                    };
+
+                    // In case images are already loaded
+                    if (preview1.complete && preview2.complete) {
+                        preview1.onload();
+                        preview2.onload();
+                    }
+                }, 2500);
+            });
+        });
+    </script>
+</body>
+</html>
