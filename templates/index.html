@@ -480,103 +480,13 @@
                 });
             }
 
-            const image1Input = document.getElementById('image1');
-            const image2Input = document.getElementById('image2');
-            const preview1 = document.getElementById('preview1');
-            const preview2 = document.getElementById('preview2');
-            const submitBtn = document.getElementById('submitBtn');
-            const btnText = document.getElementById('btnText');
-            const resultContent = document.getElementById('resultContent');
+           // Replace the submit button click handler with this:
+            submitBtn.addEventListener('click', async function() {
+                if (!image1Data || !image2Data) {
+                    showError('Please upload both images first');
+                    return;
+                }
 
-            let image1Data = null;
-            let image2Data = null;
-
-            // Function to handle image upload and preview
-            function handleImageUpload(input, preview, imageNumber) {
-                return function(e) {
-                    const file = e.target.files[0];
-                    if (!file) return;
-
-                    // Check if the file is an image
-                    if (!file.type.match('image.*')) {
-                        showError('Please select a valid image file (JPEG, PNG, etc.)');
-                        return;
-                    }
-
-                    // Check file size (max 5MB)
-                    if (file.size > 5 * 1024 * 1024) {
-                        showError('Image size should be less than 5MB');
-                        return;
-                    }
-
-                    const reader = new FileReader();
-
-                    reader.onload = function(event) {
-                        preview.src = event.target.result;
-                        preview.style.opacity = '0';
-                        setTimeout(() => {
-                            preview.style.opacity = '1';
-                            preview.style.transition = 'opacity 0.5s ease';
-                        }, 10);
-
-                        // Store the image data
-                        if (imageNumber === 1) {
-                            image1Data = {
-                                src: event.target.result,
-                                file: file
-                            };
-                        } else {
-                            image2Data = {
-                                src: event.target.result,
-                                file: file
-                            };
-                        }
-
-                        // Enable submit button if both images are uploaded
-                        if (image1Data && image2Data) {
-                            submitBtn.disabled = false;
-                            submitBtn.style.background = 'linear-gradient(45deg, #4facfe, #00f2fe)';
-                            submitBtn.style.boxShadow = '0 4px 15px rgba(79, 172, 254, 0.4)';
-                        }
-                    };
-
-                    reader.onerror = function() {
-                        showError('Error reading the image file');
-                    };
-
-                    reader.readAsDataURL(file);
-                };
-            }
-
-            function showError(message) {
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'error-message';
-                errorDiv.style.color = '#ff6b6b';
-                errorDiv.style.marginTop = '10px';
-                errorDiv.style.textAlign = 'center';
-                errorDiv.style.fontWeight = '500';
-                errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
-
-                // Remove any existing error messages
-                const existingErrors = document.querySelectorAll('.error-message');
-                existingErrors.forEach(err => err.remove());
-
-                document.body.appendChild(errorDiv);
-
-                // Remove error after 3 seconds
-                setTimeout(() => {
-                    errorDiv.style.opacity = '0';
-                    errorDiv.style.transition = 'opacity 0.5s ease';
-                    setTimeout(() => errorDiv.remove(), 500);
-                }, 3000);
-            }
-
-            // Event listeners for image uploads
-            image1Input.addEventListener('change', handleImageUpload(image1Input, preview1, 1));
-            image2Input.addEventListener('change', handleImageUpload(image2Input, preview2, 2));
-
-            // Submit button handler
-            submitBtn.addEventListener('click', function() {
                 // Show loading state
                 submitBtn.disabled = true;
                 btnText.textContent = 'Analyzing...';
@@ -584,61 +494,82 @@
                     <div class="loading">
                         <div class="loading-spinner"></div>
                     </div>
-                    <p style="text-align: center; margin-top: 1rem;">Processing your images, please wait...</p>
+                    <p style="text-align: center; margin-top: 1rem;">Processing your signatures, please wait...</p>
                 `;
 
-                // Simulate processing (replace with actual image processing logic)
-                setTimeout(function() {
-                    // Get image dimensions after they load
-                    preview1.onload = preview2.onload = function() {
-                        // Example result - replace with your actual image processing results
-                        const resultHTML = `
-                            <div style="animation: fadeIn 0.8s ease;">
-                                <h3 style="font-size: 1.4rem; margin-bottom: 1.5rem; text-align: center;">Comparison Results</h3>
-                                <div style="display: flex; flex-wrap: wrap; gap: 2rem; justify-content: center; margin-bottom: 2rem;">
-                                    <div style="flex: 1; min-width: 250px; background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 12px;">
-                                        <h4 style="font-size: 1.2rem; margin-bottom: 1rem; color: #4facfe; text-align: center;">Image 1 Analysis</h4>
-                                        <p><i class="fas fa-image" style="margin-right: 8px;"></i> Dimensions: ${preview1.naturalWidth} × ${preview1.naturalHeight}px</p>
-                                        <p><i class="fas fa-weight-hanging" style="margin-right: 8px;"></i> Size: ${(image1Data.file.size / 1024).toFixed(2)} KB</p>
-                                        <p><i class="fas fa-file-alt" style="margin-right: 8px;"></i> Type: ${image1Data.file.type}</p>
-                                        <div style="margin-top: 1rem; text-align: center;">
-                                            <img src="${image1Data.src}" style="max-width: 100%; max-height: 150px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.2);">
-                                        </div>
-                                    </div>
-                                    <div style="flex: 1; min-width: 250px; background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 12px;">
-                                        <h4 style="font-size: 1.2rem; margin-bottom: 1rem; color: #00f2fe; text-align: center;">Image 2 Analysis</h4>
-                                        <p><i class="fas fa-image" style="margin-right: 8px;"></i> Dimensions: ${preview2.naturalWidth} × ${preview2.naturalHeight}px</p>
-                                        <p><i class="fas fa-weight-hanging" style="margin-right: 8px;"></i> Size: ${(image2Data.file.size / 1024).toFixed(2)} KB</p>
-                                        <p><i class="fas fa-file-alt" style="margin-right: 8px;"></i> Type: ${image2Data.file.type}</p>
-                                        <div style="margin-top: 1rem; text-align: center;">
-                                            <img src="${image2Data.src}" style="max-width: 100%; max-height: 150px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.2);">
-                                        </div>
+                try {
+                    // Convert data URLs to Blobs
+                    const image1Blob = dataURLtoBlob(image1Data.src);
+                    const image2Blob = dataURLtoBlob(image2Data.src);
+
+                    // Create FormData and append files
+                    const formData = new FormData();
+                    formData.append('image1', image1Blob, 'signature1.jpg');
+                    formData.append('image2', image2Blob, 'signature2.jpg');
+
+                    // Send to Flask backend
+                    const response = await fetch('/compare', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (result.error) {
+                        showError(result.error);
+                        return;
+                    }
+
+                    // Display results
+                    resultContent.innerHTML = `
+                        <div style="animation: fadeIn 0.8s ease;">
+                            <h3 style="font-size: 1.4rem; margin-bottom: 1.5rem; text-align: center;">Signature Verification Results</h3>
+                            <div style="display: flex; flex-wrap: wrap; gap: 2rem; justify-content: center; margin-bottom: 2rem;">
+                                <div style="flex: 1; min-width: 250px; background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 12px;">
+                                    <h4 style="font-size: 1.2rem; margin-bottom: 1rem; color: #4facfe; text-align: center;">Signature 1</h4>
+                                    <div style="margin-top: 1rem; text-align: center;">
+                                        <img src="${image1Data.src}" style="max-width: 100%; max-height: 150px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.2);">
                                     </div>
                                 </div>
-                                <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 12px; margin-top: 1rem;">
-                                    <h4 style="font-size: 1.2rem; margin-bottom: 1rem; text-align: center;"><i class="fas fa-chart-bar" style="margin-right: 8px;"></i> Comparison Summary</h4>
-                                    <p><i class="fas fa-ruler-combined" style="margin-right: 8px;"></i> <strong>Dimension Difference:</strong> ${Math.abs(preview1.naturalWidth - preview2.naturalWidth)}px width, ${Math.abs(preview1.naturalHeight - preview2.naturalHeight)}px height</p>
-                                    <p><i class="fas fa-balance-scale" style="margin-right: 8px;"></i> <strong>Size Difference:</strong> ${Math.abs((image1Data.file.size - image2Data.file.size) / 1024).toFixed(2)} KB</p>
-                                    <p style="margin-top: 1rem; font-style: italic; text-align: center;">Note: This is a demo. Add your actual image processing logic here.</p>
+                                <div style="flex: 1; min-width: 250px; background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 12px;">
+                                    <h4 style="font-size: 1.2rem; margin-bottom: 1rem; color: #00f2fe; text-align: center;">Signature 2</h4>
+                                    <div style="margin-top: 1rem; text-align: center;">
+                                        <img src="${image2Data.src}" style="max-width: 100%; max-height: 150px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.2);">
+                                    </div>
                                 </div>
                             </div>
-                        `;
-
-                        resultContent.innerHTML = resultHTML;
-                        btnText.textContent = 'Process Images';
-                        submitBtn.disabled = false;
-                        submitBtn.style.background = 'linear-gradient(45deg, #4facfe, #00f2fe)';
-                        submitBtn.style.boxShadow = '0 4px 15px rgba(79, 172, 254, 0.4)';
-                    };
-
-                    // In case images are already loaded
-                    if (preview1.complete && preview2.complete) {
-                        preview1.onload();
-                        preview2.onload();
-                    }
-                }, 2500);
+                            <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 12px; margin-top: 1rem;">
+                                <h4 style="font-size: 1.2rem; margin-bottom: 1rem; text-align: center;">
+                                    <i class="fas fa-chart-bar" style="margin-right: 8px;"></i> Verification Summary
+                                </h4>
+                                <p style="font-size: 1.1rem; text-align: center; margin-bottom: 1rem; color: ${result.is_genuine ? '#4CAF50' : '#F44336'};">
+                                    <strong>${result.message}</strong>
+                                </p>
+                                <p><i class="fas fa-percentage" style="margin-right: 8px;"></i> <strong>Similarity Score:</strong> ${(result.similarity_score * 100).toFixed(2)}%</p>
+                                <p><i class="fas fa-info-circle" style="margin-right: 8px;"></i> <strong>Interpretation:</strong> Scores above 70% typically indicate genuine signatures</p>
+                            </div>
+                        </div>
+                    `;
+                } catch (error) {
+                    showError('An error occurred during processing: ' + error.message);
+                } finally {
+                    btnText.textContent = 'Process Images';
+                    submitBtn.disabled = false;
+                }
             });
-        });
+
+            // Helper function to convert data URL to Blob
+            function dataURLtoBlob(dataURL) {
+                const arr = dataURL.split(',');
+                const mime = arr[0].match(/:(.*?);/)[1];
+                const bstr = atob(arr[1]);
+                let n = bstr.length;
+                const u8arr = new Uint8Array(n);
+                while (n--) {
+                    u8arr[n] = bstr.charCodeAt(n);
+                }
+                return new Blob([u8arr], { type: mime });
+            }
     </script>
 </body>
 </html>
